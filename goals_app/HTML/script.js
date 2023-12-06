@@ -83,26 +83,25 @@ document.addEventListener('DOMContentLoaded', () => {
         newGoalContainer.appendChild(progressBarContainer);
         newGoalContainer.appendChild(buttonContainer);
 
-        // Append the new goal container before the "Add Goal" button
         existingGoalContainer.insertBefore(newGoalContainer, existingGoalContainer.firstChild);
 
         if (type === 'timed') {
-            startTimedGoal(progressBar, timePeriod);
+            startTimedGoal(progressBar, timePeriod, title);
         }
     }
-
-    function startTimedGoal(progressBar, timePeriod) {
+      
+    function startTimedGoal(progressBar, timePeriod, title) {
         let progressValue = 0;
-        const interval = (timePeriod * 60 * 1000) / 100; // Adjust interval based on timePeriod
-
+        const interval = (timePeriod * 60 * 1000) / 100;
+      
         const timerId = setInterval(() => {
-            if (progressValue < 100) {
-                progressValue += 1;
-                updateProgressBar(progressBar, progressValue);
-            } else {
-                clearInterval(timerId);
-            }
-        }, interval);
+        if (progressValue < 100) {
+            progressValue += 1;
+            updateProgressBar(progressBar, progressValue);
+        } else {
+            clearInterval(timerId);
+            showNotification(title);
+        }}, interval);
     }
 
     function updateGoalProgress(button, increment) {
@@ -110,14 +109,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const progressBar = goalContainer.querySelector('.progress-bar');
 
         let progressValue = parseInt(progressBar.dataset.progress, 10) + increment;
-        progressValue = Math.min(100, Math.max(0, progressValue)); // Ensure progress is within [0, 100]
+        progressValue = Math.min(100, Math.max(0, progressValue)); 
 
         progressBar.dataset.progress = progressValue;
         progressBar.style.width = `${progressValue}%`;
     }
 
     function updateProgressBar(progressBar, progressValue) {
-        progressValue = Math.min(100, Math.max(0, progressValue)); // Ensure progress is within [0, 100]
+        progressValue = Math.min(100, Math.max(0, progressValue)); 
         progressBar.dataset.progress = progressValue;
         progressBar.style.width = `${progressValue}%`;
     }
@@ -129,4 +128,30 @@ document.addEventListener('DOMContentLoaded', () => {
             timedOptions.style.display = 'none';
         }
     });
+
+    function showNotification(title) {
+        const notificationsContainer = document.getElementById('notifications-container');
+    
+        const notification = document.createElement('div');
+        notification.classList.add('notification');
+        notification.textContent = `${title} completed!`;
+    
+        const closeButton = document.createElement('span');
+        closeButton.innerHTML = '&times;';
+        closeButton.classList.add('notification-close-btn');
+        closeButton.addEventListener('click', () => {
+          notification.classList.remove('show');
+          setTimeout(() => {
+            notificationsContainer.removeChild(notification);
+          }, 300); // 0.3s, matching the transition duration
+        });
+    
+        notification.appendChild(closeButton);
+    
+        notificationsContainer.appendChild(notification);
+    
+        setTimeout(() => {
+          notification.classList.add('show');
+        }, 10); // Adding a small delay to trigger the transition
+      }
 });
