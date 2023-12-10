@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const goalContainer = document.getElementById('goal-container');
     const addGoalButton = document.getElementById('add-goal-btn');
     const modalOverlay = document.getElementById('modal-overlay');
-    const goalForm = document.getElementById('goal-form');
     const createGoalButton = document.getElementById('create-goal-btn');
     const cancelGoalButton = document.getElementById('cancel-goal-btn');
     const goalTypeSelect = document.getElementById('goal-type');
@@ -44,74 +43,84 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function createNewGoal(title, type, timePeriod, threshold) {
         let existingGoalContainer = document.getElementById('goal-container');
-
+    
         if (!existingGoalContainer) {
             existingGoalContainer = document.createElement('div');
             existingGoalContainer.id = 'goal-container';
             document.body.appendChild(existingGoalContainer);
         }
-
+    
         const newGoalContainer = document.createElement('div');
         newGoalContainer.classList.add('goal-container');
-
+    
         const goalTitleElement = document.createElement('div');
         goalTitleElement.classList.add('goal-title');
         goalTitleElement.textContent = title;
-
+    
         const progressBarContainer = document.createElement('div');
         progressBarContainer.classList.add('progress-bar-container');
-
+    
         const progressBar = document.createElement('div');
         progressBar.classList.add('progress-bar');
         progressBar.dataset.progress = '0';
-
+    
         progressBarContainer.appendChild(progressBar);
+    
         const buttonContainer = document.createElement('div');
         buttonContainer.classList.add('goal-buttons');
-      
-        const plusButton = document.createElement('button');
-        plusButton.classList.add('plus-btn');
-        plusButton.textContent = '+1';
-      
-        const minusButton = document.createElement('button');
-        minusButton.classList.add('minus-btn');
-        minusButton.textContent = '-1';
-      
-        buttonContainer.appendChild(plusButton);
-        buttonContainer.appendChild(minusButton);
-
+    
         newGoalContainer.appendChild(goalTitleElement);
         newGoalContainer.appendChild(progressBarContainer);
         newGoalContainer.appendChild(buttonContainer);
-
+    
         existingGoalContainer.insertBefore(newGoalContainer, existingGoalContainer.firstChild);
-
+    
         if (type === 'progressional') {
-            startProgressionalGoal(newGoalContained, title, threshold);
-        }
-        if (type === 'timed') {
+            startProgressionalGoal(newGoalContainer, title, threshold);
+        } else if (type === 'timed') {
             startTimedGoal(progressBar, timePeriod, title);
         }
+    
+        modalOverlay.style.display = 'none';
     }
 
-    function startProgressionalGoal(goalContainer, title, threshold) {
+    function startProgressionalGoal(existingGoalContainer, title, threshold) {
+        const goalContainer = document.createElement('div');
+        goalContainer.classList.add('goal-container');
+    
+        const goalTitleElement = document.createElement('div');
+        goalTitleElement.classList.add('goal-title');
+        goalTitleElement.textContent = title;
+    
+        const progressBarContainer = document.createElement('div');
+        progressBarContainer.classList.add('progress-bar-container');
+    
+        const progressBar = document.createElement('div');
+        progressBar.classList.add('progress-bar');
+        progressBar.dataset.progress = '0';
+    
+        progressBarContainer.appendChild(progressBar);
+    
+        const buttonContainer = document.createElement('div');
+        buttonContainer.classList.add('goal-buttons');
+    
         const plusButton = document.createElement('button');
         plusButton.classList.add('plus-btn');
         plusButton.textContent = '+1';
         plusButton.addEventListener('click', () => updateGoalProgress(plusButton, 1, threshold));
-
+    
         const minusButton = document.createElement('button');
         minusButton.classList.add('minus-btn');
         minusButton.textContent = '-1';
         minusButton.addEventListener('click', () => updateGoalProgress(minusButton, -1, threshold));
-
+    
         buttonContainer.appendChild(plusButton);
         buttonContainer.appendChild(minusButton);
-
+    
         goalContainer.appendChild(goalTitleElement);
         goalContainer.appendChild(progressBarContainer);
         goalContainer.appendChild(buttonContainer);
-
+    
         existingGoalContainer.insertBefore(goalContainer, existingGoalContainer.firstChild);
     }
       
@@ -151,10 +160,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (goalTypeSelect.value === 'timed') {
             timedOptions.style.display = 'block';
-            thresholdInput.style.display = 'none'; // Hide the threshold input for timed events
+            thresholdInput.style.display = 'none';
         } else {
             timedOptions.style.display = 'none';
-            thresholdInput.style.display = 'block'; // Show the threshold input for progressional events
+            thresholdInput.style.display = 'block';
         }
     });
 
@@ -172,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
           notification.classList.remove('show');
           setTimeout(() => {
             notificationsContainer.removeChild(notification);
-          }, 300); // 0.3s, matching the transition duration
+          }, 300);
         });
     
         notification.appendChild(closeButton);
@@ -181,6 +190,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
         setTimeout(() => {
           notification.classList.add('show');
-        }, 10); // Adding a small delay to trigger the transition
+        }, 10);
       }
 });
