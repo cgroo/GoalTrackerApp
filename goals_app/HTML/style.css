@@ -1,3 +1,6 @@
+body {
+  background-color:rgb(120, 172, 215);
+}
 .modal-overlay {
     display: none;
     position: fixed;
