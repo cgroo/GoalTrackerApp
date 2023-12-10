@@ -22,13 +22,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const title = titleInput.value;
         const type = goalTypeSelect.value;
         const timePeriod = parseInt(timePeriodInput.value, 10);
+        const threshold = type === 'timed' ? null : parseInt(document.getElementById('threshold').value, 10) || 100;
 
         if (title.trim() === '') {
             alert('Please enter a title for your goal.');
             return;
         }
 
-        createNewGoal(title, type, timePeriod);
+        createNewGoal(title, type, timePeriod, threshold);
         modalOverlay.style.display = 'none';
     });
 
@@ -41,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    function createNewGoal(title, type, timePeriod) {
+    function createNewGoal(title, type, timePeriod, threshold) {
         let existingGoalContainer = document.getElementById('goal-container');
 
         if (!existingGoalContainer) {
@@ -85,9 +86,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
         existingGoalContainer.insertBefore(newGoalContainer, existingGoalContainer.firstChild);
 
+        if (type === 'progressional') {
+            startProgressionalGoal(newGoalContained, title, threshold);
+        }
         if (type === 'timed') {
             startTimedGoal(progressBar, timePeriod, title);
         }
+    }
+
+    function startProgressionalGoal(goalContainer, title, threshold) {
+        const plusButton = document.createElement('button');
+        plusButton.classList.add('plus-btn');
+        plusButton.textContent = '+1';
+        plusButton.addEventListener('click', () => updateGoalProgress(plusButton, 1, threshold));
+
+        const minusButton = document.createElement('button');
+        minusButton.classList.add('minus-btn');
+        minusButton.textContent = '-1';
+        minusButton.addEventListener('click', () => updateGoalProgress(minusButton, -1, threshold));
+
+        buttonContainer.appendChild(plusButton);
+        buttonContainer.appendChild(minusButton);
+
+        goalContainer.appendChild(goalTitleElement);
+        goalContainer.appendChild(progressBarContainer);
+        goalContainer.appendChild(buttonContainer);
+
+        existingGoalContainer.insertBefore(goalContainer, existingGoalContainer.firstChild);
     }
       
     function startTimedGoal(progressBar, timePeriod, title) {
@@ -109,10 +134,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const progressBar = goalContainer.querySelector('.progress-bar');
 
         let progressValue = parseInt(progressBar.dataset.progress, 10) + increment;
-        progressValue = Math.min(100, Math.max(0, progressValue)); 
+        progressValue = Math.min(threshold, Math.max(0, progressValue));
 
         progressBar.dataset.progress = progressValue;
-        progressBar.style.width = `${progressValue}%`;
+        progressBar.style.width = `${(progressValue / threshold) * 100}%`;
     }
 
     function updateProgressBar(progressBar, progressValue) {
@@ -122,10 +147,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     goalTypeSelect.addEventListener('change', () => {
+        const thresholdInput = document.getElementById('threshold');
+
         if (goalTypeSelect.value === 'timed') {
             timedOptions.style.display = 'block';
+            thresholdInput.style.display = 'none'; // Hide the threshold input for timed events
         } else {
             timedOptions.style.display = 'none';
+            thresholdInput.style.display = 'block'; // Show the threshold input for progressional events
         }
     });
 
