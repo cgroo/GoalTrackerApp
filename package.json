@@ -1,9 +1,0 @@
-{
-  "name": "GoalTrackerApp",
-  "lockfileVersion": 3,
-  "requires": true,
-  "packages": {},
-  "scripts": {
-    "dev": "next dev"
-  }
-}
