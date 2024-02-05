@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const timePeriodInput = document.getElementById('time-period');
     const titleInput = document.getElementById('title');
     const notificationsContainer = document.getElementById('notifications-container');
+    let counter;  // Declare counter as a global variable
 
     addGoalButton.addEventListener('click', () => {
         modalOverlay.style.display = 'block';
@@ -64,16 +65,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function createNewProgressionalGoal(existingGoalContainer, goalId, threshold, title) {
         let timed = false;
-        const newGoalContainer = createGoalContainer(goalId, title, threshold, timed);
+        const { newGoalContainer, progressBar, progressCounter } = createGoalContainer(goalId, title, threshold, timed);
         existingGoalContainer.insertBefore(newGoalContainer, existingGoalContainer.firstChild);
+        counter = { progressBar, progressCounter };
 
         startProgress(goalId, threshold);
     }
 
-    function createNewTimedGoal(existingGoalContainer, goalId, timePeriod, title, ) {
+    function createNewTimedGoal(existingGoalContainer, goalId, timePeriod, title) {
         let timed = true;
-        const newGoalContainer = createGoalContainer(goalId, title, 100, timed);
+        const { newGoalContainer, progressBar, progressCounter } = createGoalContainer(goalId, title, 100, timed);
         existingGoalContainer.insertBefore(newGoalContainer, existingGoalContainer.firstChild);
+        counter = { progressBar, progressCounter };
 
         startTimedGoal(goalId, timePeriod, title);
     }
@@ -94,12 +97,16 @@ document.addEventListener('DOMContentLoaded', () => {
         progressBar.classList.add('progress-bar');
         progressBar.dataset.progress = '0';
 
-        const counter = document.createElement('div');
-        counter.classList.add('counter');
-        counter.textContent = '0/${threshold}';
+        const counterContainer = document.createElement('div');
+        counterContainer.classList.add('counter-container');
+
+        const progressCounter = document.createElement('div');
+        progressCounter.classList.add('counter');
+        progressCounter.textContent = `0/${threshold}`;
         
         progressBarContainer.appendChild(progressBar);
-        progressBarContainer.appendChild(counter);
+        counterContainer.appendChild(progressCounter);
+        progressBarContainer.appendChild(counterContainer);
 
         const buttonContainer = document.createElement('div');
         buttonContainer.classList.add('goal-buttons');
@@ -122,28 +129,35 @@ document.addEventListener('DOMContentLoaded', () => {
         newGoalContainer.appendChild(goalTitleElement);
         newGoalContainer.appendChild(progressBarContainer);
         newGoalContainer.appendChild(buttonContainer);
-        return newGoalContainer;
+
+        return { newGoalContainer, progressBar, progressCounter };
+    }
+
+    function startTimedGoal(goalId, timePeriod, title) {
+        let remainingTime = timePeriod * 60;
+    
+        const progressBar = document.getElementById(goalId).querySelector('.progress-bar');
+        const progressCounter = document.getElementById(goalId).querySelector('.counter');
+    
+        function updateTimer() {
+            if (remainingTime > 0) {
+                remainingTime -= 1;
+                const minutes = Math.floor(remainingTime / 60);
+                const seconds = remainingTime % 60;
+                progressCounter.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                updateProgressBar(progressBar, (timePeriod * 60 - remainingTime) / (timePeriod * 60) * 100);
+                setTimeout(updateTimer, 1000);
+            } else {
+                showNotification(title);
+            }
+        }
+    
+        updateTimer();
     }
     
 
-    function startTimedGoal(goalId, timePeriod, title) {
-        let progressValue = 0;
-        const interval = (timePeriod * 60 * 1000) / 100;
-
-        const timerId = setInterval(() => {
-            if (progressValue < 100) {
-                progressValue += 1;
-                updateProgressBar(document.getElementById(goalId).querySelector('.progress-bar'), progressValue);
-                counter.textContent = `${formatTimeRemaining((100 - progressValue) * (timePeriod * 600))}`;
-            } else {
-                clearInterval(timerId);
-                showNotification(title);
-            }
-        }, interval);
-    }
-
     function updateGoalProgress(goalId, increment, threshold) {
-        const progressBar = document.getElementById(goalId).querySelector('.progress-bar');
+        const progressBar = counter.progressBar;
 
         let progressValue = parseInt(progressBar.dataset.progress, 10) + increment;
         progressValue = Math.min(threshold, Math.max(0, progressValue));
@@ -151,7 +165,10 @@ document.addEventListener('DOMContentLoaded', () => {
         progressBar.dataset.progress = progressValue;
         progressBar.style.width = `${(progressValue / threshold) * 100}%`;
         
-        counter.textContent = `${progressValue}/${threshold}`;
+        counter.progressCounter.textContent = `${progressValue}/${threshold}`;
+        if (progressValue === threshold) {
+            showNotification(document.getElementById(goalId).querySelector('.goal-title').textContent);
+        }
     }
 
     function updateProgressBar(progressBar, progressValue) {
