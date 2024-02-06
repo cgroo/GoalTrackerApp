@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const ongoingTab = document.getElementById('ongoing-tab');
+    const completedTab = document.getElementById('completed-tab');
     const goalContainer = document.getElementById('goal-container');
     const addGoalButton = document.getElementById('add-goal-btn');
     const modalOverlay = document.getElementById('modal-overlay');
@@ -11,6 +13,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const notificationsContainer = document.getElementById('notifications-container');
     let counter;  // Declare counter as a global variable
     let goals = {}; // Declare array to store goals
+    ongoingTab.addEventListener('click', () => {
+        ongoingTab.classList.add('active');
+        completedTab.classList.remove('active');
+        goalContainer.classList.remove('completed-goals');
+        addGoalButton.style.display = 'block';
+      });
+    
+      completedTab.addEventListener('click', () => {
+        completedTab.classList.add('active');
+        ongoingTab.classList.remove('active');
+        goalContainer.classList.add('completed-goals');
+        addGoalButton.style.display = 'none';
+      });
 
     addGoalButton.addEventListener('click', () => {
         modalOverlay.style.display = 'block';

@@ -89,3 +89,31 @@ body {
 .counter {
   color: #fff; /* Adjust the color as needed */
 }
+
+#tabs {
+  display: flex;
+  justify-content: space-around;
+  background-color: #fff;
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  position: fixed;
+  top: 0;
+  z-index: 2;
+}
+
+.tab {
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 8px;
+  transition: background-color 0.3s;
+}
+
+.tab.active {
+  background-color: #ccc; /* Highlight color for the active tab */
+}
+
+#goal-container.completed-goals {
+  display: none; /* Initially hide completed goals */
+}
