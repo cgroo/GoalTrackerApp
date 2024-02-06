@@ -57,28 +57,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const existingGoalContainer = document.getElementById('goal-container');
 
         if (type === 'progressional') {
-            createNewProgressionalGoal(existingGoalContainer, goalId, threshold, title);
+            createNewGoal(existingGoalContainer, goalId, threshold, title, false);
         } else if (type === 'timed') {
-            createNewTimedGoal(existingGoalContainer, goalId, timePeriod, title);
+            createNewGoal(existingGoalContainer, goalId, 100, title, true);
+            startTimedGoal(goalId, timePeriod, title);
         }
     });
 
-    function createNewProgressionalGoal(existingGoalContainer, goalId, threshold, title) {
-        let timed = false;
-        const { newGoalContainer, progressBar, progressCounter } = createGoalContainer(goalId, title, threshold, timed);
+    function createNewGoal(existingGoalContainer, goalId, threshold, title, isTimed) {
+        const { newGoalContainer, progressBar, progressCounter } = createGoalContainer(goalId, title, threshold, isTimed);
         existingGoalContainer.insertBefore(newGoalContainer, existingGoalContainer.firstChild);
         counter = { progressBar, progressCounter };
 
-        startProgress(goalId, threshold);
-    }
-
-    function createNewTimedGoal(existingGoalContainer, goalId, timePeriod, title) {
-        let timed = true;
-        const { newGoalContainer, progressBar, progressCounter } = createGoalContainer(goalId, title, 100, timed);
-        existingGoalContainer.insertBefore(newGoalContainer, existingGoalContainer.firstChild);
-        counter = { progressBar, progressCounter };
-
-        startTimedGoal(goalId, timePeriod, title);
+        if (!isTimed) {
+            startProgress(goalId, threshold);
+        }
     }
 
     function createGoalContainer(goalId, title, threshold, isTimed) {
@@ -155,7 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTimer();
     }
     
-
     function updateGoalProgress(goalId, increment, threshold) {
         const progressBar = counter.progressBar;
 
