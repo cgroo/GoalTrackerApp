@@ -177,36 +177,72 @@ document.addEventListener('DOMContentLoaded', () => {
         progressBar.style.width = `${progressValue}%`;
     }
 
+    let completedGoalsCount = 0;
+
     function showNotification(title) {
         const notification = document.createElement('div');
         notification.classList.add('notification');
         notification.textContent = `${title} completed!`;
-
+    
         const closeButton = document.createElement('span');
         closeButton.innerHTML = '&times;';
         closeButton.classList.add('notification-close-btn');
         closeButton.addEventListener('click', () => {
+            notification.classList.add('removed');
             notification.classList.remove('show');
             setTimeout(() => {
                 notificationsContainer.removeChild(notification);
+                updateNotificationPositions();
             }, 300);
         });
-
+    
         notification.appendChild(closeButton);
-
-        notificationsContainer.insertBefore(notification, notificationsContainer.firstChild);
-
+    
+        notificationsContainer.appendChild(notification); // Append at the bottom
+    
         setTimeout(() => {
             notification.classList.add('show');
+            completedGoalsCount += 1;
+            updateTabTitle();
+            updateNotificationPositions();
         }, 10);
     }
-
-    function formatTimeRemaining(milliseconds) {
-        const minutes = Math.floor(milliseconds / (60 * 1000));
-        const seconds = Math.floor((milliseconds % (60 * 1000)) / 1000);
-        const millisecondsPart = milliseconds % 1000;
-        return `${minutes}:${seconds}:${millisecondsPart}`;
+    
+    function updateNotificationPositions() {
+        const notifications = notificationsContainer.querySelectorAll('.notification');
+        let offset = 0;
+    
+        notifications.forEach((notification, index) => {
+            notification.style.bottom = `${offset}px`;
+            offset += notification.offsetHeight + 10; // Adjust 10 pixels for spacing
+    
+            // If a notification is removed, update positions above it
+            if (notification.classList.contains('removed')) {
+                const remainingNotifications = notifications.length - index - 1;
+                for (let i = index + 1; i < notifications.length; i++) {
+                    const aboveNotification = notifications[i];
+                    aboveNotification.style.bottom = `${parseInt(aboveNotification.style.bottom) - notification.offsetHeight - 10}px`;
+                }
+            }
+        });
     }
+    // Add this event listener to update positions on window resize
+    window.addEventListener('resize', updateNotificationPositions);
+    
+    function updateTabTitle() {
+        if (completedGoalsCount > 0) {
+            document.title = `(${completedGoalsCount}) Goals Completed`;
+        } else {
+            document.title = 'Goal Tracker';
+        }
+    }
+    
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            completedGoalsCount = 0;
+            updateTabTitle();
+        }
+    });
 
     function clearGoalForm() {
         titleInput.value = '';
