@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const titleInput = document.getElementById('title');
     const notificationsContainer = document.getElementById('notifications-container');
     let counter;  // Declare counter as a global variable
+    let goals = {}; // Declare array to store goals
 
     addGoalButton.addEventListener('click', () => {
         modalOverlay.style.display = 'block';
@@ -67,7 +68,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function createNewGoal(existingGoalContainer, goalId, threshold, title, isTimed) {
         const { newGoalContainer, progressBar, progressCounter } = createGoalContainer(goalId, title, threshold, isTimed);
         existingGoalContainer.insertBefore(newGoalContainer, existingGoalContainer.firstChild);
-        counter = { progressBar, progressCounter };
+
+        // Store progress information for each goal
+        goals[goalId] = { progressBar, progressCounter, threshold, isTimed, progressValue: 0 };
 
         if (!isTimed) {
             startProgress(goalId, threshold);
@@ -149,15 +152,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function updateGoalProgress(goalId, increment, threshold) {
-        const progressBar = counter.progressBar;
+        const goal = goals[goalId];
 
-        let progressValue = parseInt(progressBar.dataset.progress, 10) + increment;
+        let progressValue = goal.progressValue + increment;
         progressValue = Math.min(threshold, Math.max(0, progressValue));
 
-        progressBar.dataset.progress = progressValue;
-        progressBar.style.width = `${(progressValue / threshold) * 100}%`;
-        
-        counter.progressCounter.textContent = `${progressValue}/${threshold}`;
+        goal.progressBar.dataset.progress = progressValue;
+        goal.progressBar.style.width = `${(progressValue / threshold) * 100}%`;
+
+        goal.progressCounter.textContent = `${progressValue}/${threshold}`;
+        goal.progressValue = progressValue;
+
         if (progressValue === threshold) {
             showNotification(document.getElementById(goalId).querySelector('.goal-title').textContent);
         }
