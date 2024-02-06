@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const titleInput = document.getElementById('title');
     const notificationsContainer = document.getElementById('notifications-container');
     let ongoingGoals = {}; // Array to store ongoing goals
+    let completedGoals = {}; // Array to store completed goals
 
     ongoingTab.addEventListener('click', () => { // Handles user click on ongoing goals tab
         ongoingTab.classList.add('active');
