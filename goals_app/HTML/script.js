@@ -11,42 +11,42 @@ document.addEventListener('DOMContentLoaded', () => {
     const timePeriodInput = document.getElementById('time-period');
     const titleInput = document.getElementById('title');
     const notificationsContainer = document.getElementById('notifications-container');
-    let counter;  // Declare counter as a global variable
-    let goals = {}; // Declare array to store goals
-    ongoingTab.addEventListener('click', () => {
+    let ongoingGoals = {}; // Array to store ongoing goals
+
+    ongoingTab.addEventListener('click', () => { // Handles user click on ongoing goals tab
         ongoingTab.classList.add('active');
         completedTab.classList.remove('active');
         goalContainer.classList.remove('completed-goals');
         addGoalButton.style.display = 'block';
       });
     
-      completedTab.addEventListener('click', () => {
+      completedTab.addEventListener('click', () => { // Handles user click on completed goals tab
         completedTab.classList.add('active');
         ongoingTab.classList.remove('active');
         goalContainer.classList.add('completed-goals');
         addGoalButton.style.display = 'none';
       });
 
-    addGoalButton.addEventListener('click', () => {
+    addGoalButton.addEventListener('click', () => { // Handles user click on add goal button
         modalOverlay.style.display = 'block';
         clearGoalForm();
     });
 
-    cancelGoalButton.addEventListener('click', () => {
+    cancelGoalButton.addEventListener('click', () => { // Handles user click on cancel adding goal button
         modalOverlay.style.display = 'none';
     });
 
-    goalTypeSelect.addEventListener('change', () => {
+    goalTypeSelect.addEventListener('change', () => { // Handles user change goal type in adding goal menu
         const thresholdLabel = document.querySelector('label[for="threshold"]');
         const thresholdInput = document.getElementById('threshold');
         const timePeriodRow = document.getElementById('time-period-row');
 
-        if (goalTypeSelect.value === 'timed') {
+        if (goalTypeSelect.value === 'timed') { // If time goal
             timedOptions.style.display = 'block';
             thresholdLabel.classList.add('disabled-label');
             thresholdInput.setAttribute('disabled', 'true');
             timePeriodRow.style.display = 'flex';
-        } else {
+        } else { // If progressional goal
             timedOptions.style.display = 'none';
             thresholdLabel.classList.remove('disabled-label');
             thresholdInput.removeAttribute('disabled');
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    createGoalButton.addEventListener('click', () => {
+    createGoalButton.addEventListener('click', () => { // Create goal
         const title = titleInput.value;
         const type = goalTypeSelect.value;
         const timePeriod = parseInt(timePeriodInput.value, 10);
@@ -74,22 +74,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (type === 'progressional') {
             createNewGoal(existingGoalContainer, goalId, threshold, title, false);
+            startProgress(goalId, threshold);
         } else if (type === 'timed') {
             createNewGoal(existingGoalContainer, goalId, 100, title, true);
             startTimedGoal(goalId, timePeriod, title);
         }
     });
 
-    function createNewGoal(existingGoalContainer, goalId, threshold, title, isTimed) {
+    function createNewGoal(existingGoalContainer, goalId, threshold, title, isTimed) { // Make virtual goal on screen real estate
         const { newGoalContainer, progressBar, progressCounter } = createGoalContainer(goalId, title, threshold, isTimed);
         existingGoalContainer.insertBefore(newGoalContainer, existingGoalContainer.firstChild);
 
         // Store progress information for each goal
-        goals[goalId] = { progressBar, progressCounter, threshold, isTimed, progressValue: 0 };
-
-        if (!isTimed) {
-            startProgress(goalId, threshold);
-        }
+        ongoingGoals[goalId] = { progressBar, progressCounter, threshold, isTimed, progressValue: 0 };
     }
 
     function createGoalContainer(goalId, title, threshold, isTimed) {
@@ -167,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function updateGoalProgress(goalId, increment, threshold) {
-        const goal = goals[goalId];
+        const goal = ongoingGoals[goalId];
 
         let progressValue = goal.progressValue + increment;
         progressValue = Math.min(threshold, Math.max(0, progressValue));
@@ -180,6 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (progressValue === threshold) {
             showNotification(document.getElementById(goalId).querySelector('.goal-title').textContent);
+
         }
     }
 
@@ -202,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
         closeButton.addEventListener('click', () => {
             notification.classList.add('removed');
             notification.classList.remove('show');
+            delete ongoingGoals[goalId];
             setTimeout(() => {
                 notificationsContainer.removeChild(notification);
                 updateNotificationPositions();

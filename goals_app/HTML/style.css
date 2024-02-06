@@ -1,6 +1,7 @@
 body {
   background-color:rgb(120, 172, 215);
 }
+
 .modal-overlay {
     display: none; 
 
@@ -13,7 +14,6 @@ body {
     z-index: 1;
   }
   
-
   .goal-form {
     background: #fff;
     padding: 20px;
@@ -43,7 +43,6 @@ body {
   display: flex;
   justify-content: space-between;
 }
-
 
   .goal-buttons {
     display: flex;
@@ -88,7 +87,7 @@ body {
 }
 
 .counter {
-  color: #fff; /* Adjust the color as needed */
+  color: #fff;
 }
 
 #tabs {
@@ -112,7 +111,7 @@ body {
 }
 
 .tab.active {
-  background-color: #ccc; /* Highlight color for the active tab */
+  background-color: #ccc;
 }
 
 #goal-container.completed-goals {
