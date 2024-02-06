@@ -225,6 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let offset = 0;
     
         notifications.forEach((notification, index) => {
+            notification.style.transition = 'bottom 0.3s ease-in-out';
             notification.style.bottom = `${offset}px`;
             offset += notification.offsetHeight + 10; // Adjust 10 pixels for spacing
     
