@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const ongoingTab = document.getElementById('ongoing-tab');
     const completedTab = document.getElementById('completed-tab');
-    const goalContainer = document.getElementById('goal-container');
+    const ongoGoalContainer = document.getElementById('ongo-goal-container');
+    const compGoalContainer = document.getElementById('comp-goal-container');
     const addGoalButton = document.getElementById('add-goal-btn');
     const modalOverlay = document.getElementById('modal-overlay');
     const createGoalButton = document.getElementById('create-goal-btn');
@@ -13,19 +14,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const notificationsContainer = document.getElementById('notifications-container');
     let ongoingGoals = {}; // Array to store ongoing goals
     let completedGoals = {}; // Array to store completed goals
+    let completedGoalsCount = 0; // Count for tab notifications
+
 
     ongoingTab.addEventListener('click', () => { // Handles user click on ongoing goals tab
         ongoingTab.classList.add('active');
-        completedTab.classList.remove('active');
-        goalContainer.classList.remove('completed-goals');
         addGoalButton.style.display = 'block';
+        completedTab.classList.remove('active');
+        ongoGoalContainer.style.display = 'block';
+        compGoalContainer.style.display = 'none';
       });
     
       completedTab.addEventListener('click', () => { // Handles user click on completed goals tab
         completedTab.classList.add('active');
-        ongoingTab.classList.remove('active');
-        goalContainer.classList.add('completed-goals');
         addGoalButton.style.display = 'none';
+        ongoingTab.classList.remove('active');
+        ongoGoalContainer.style.display = 'none';
+        compGoalContainer.style.display = 'block';
       });
 
     addGoalButton.addEventListener('click', () => { // Handles user click on add goal button
@@ -71,76 +76,98 @@ document.addEventListener('DOMContentLoaded', () => {
         // Create a unique ID for each goal to ensure uniqueness
         const goalId = `goal-${Date.now()}`;
 
-        const existingGoalContainer = document.getElementById('goal-container');
+        const existingGoalContainer = document.getElementById('ongo-goal-container');
 
         if (type === 'progressional') {
-            createNewGoal(existingGoalContainer, goalId, threshold, title, false);
-            startProgress(goalId, threshold);
+            createNewOngoGoal(existingGoalContainer, goalId, threshold, title, false);
         } else if (type === 'timed') {
-            createNewGoal(existingGoalContainer, goalId, 100, title, true);
+            createNewOngoGoal(existingGoalContainer, goalId, 100, title, true);
             startTimedGoal(goalId, timePeriod, title);
         }
     });
 
-    function createNewGoal(existingGoalContainer, goalId, threshold, title, isTimed) { // Make virtual goal on screen real estate
-        const { newGoalContainer, progressBar, progressCounter } = createGoalContainer(goalId, title, threshold, isTimed);
+    function createNewOngoGoal(existingGoalContainer, goalId, threshold, title, isTimed) { // Make virtual goal on screen real estate
+        const { newGoalContainer, progressBar, progressCounter } = createGoalContainer(goalId, title, threshold, isTimed, false);
         existingGoalContainer.insertBefore(newGoalContainer, existingGoalContainer.firstChild);
 
         // Store progress information for each goal
         ongoingGoals[goalId] = { progressBar, progressCounter, threshold, isTimed, progressValue: 0 };
     }
 
-    function createGoalContainer(goalId, title, threshold, isTimed) {
-        const newGoalContainer = document.createElement('div');
-        newGoalContainer.classList.add('goal-container');
-        newGoalContainer.id = goalId;
+    function createNewCompGoal(existingGoalContainer, goalId, threshold, title, isTimed) {
+        const { newGoalContainer, progressBar, progressCounter} = createGoalContainer(goalId, title, threshold, isTimed, true);
+        existingGoalContainer.insertBefore(newGoalContainer, existingGoalContainer.firstChild);
 
+        completedGoals[goalId] = { progressBar, progressCounter, threshold, isTimed, progressValue: threshold };
+    
+    }
+
+    function createGoalContainer(goalId, title, threshold, isTimed, isComp) {
+        const newGoalContainer = document.createElement('div');
+        if (!isComp) {
+            newGoalContainer.classList.add('ongo-goal-container');
+        }
+        else {
+            newGoalContainer.classList.add('comp-goal-container');
+        }
+        newGoalContainer.id = goalId;
+    
         const goalTitleElement = document.createElement('div');
         goalTitleElement.classList.add('goal-title');
         goalTitleElement.textContent = title;
-
+    
         const progressBarContainer = document.createElement('div');
         progressBarContainer.classList.add('progress-bar-container');
-
+    
         const progressBar = document.createElement('div');
         progressBar.classList.add('progress-bar');
-        progressBar.dataset.progress = '0';
-
+        progressBar.dataset.progress = isComp ? threshold : '0'; // Set progress based on isComp
+        progressBar.style.width = isComp ? '100%' : '0';
+    
         const counterContainer = document.createElement('div');
         counterContainer.classList.add('counter-container');
-
+    
         const progressCounter = document.createElement('div');
         progressCounter.classList.add('counter');
-        progressCounter.textContent = `0/${threshold}`;
-        
+        if (isComp) {
+            if (isTimed) {
+                progressCounter.textContent = `${threshold}:00`;
+            } else {
+                progressCounter.textContent = `${threshold}/${threshold}`;
+            }
+        } else {
+            progressCounter.textContent = isTimed ? '00:00' : `0/${threshold}`;
+        }
+    
         progressBarContainer.appendChild(progressBar);
         counterContainer.appendChild(progressCounter);
         progressBarContainer.appendChild(counterContainer);
-
+    
         const buttonContainer = document.createElement('div');
         buttonContainer.classList.add('goal-buttons');
-
-        if (!isTimed) {
+    
+        if (!isTimed && !isComp) { // Only add buttons if not timed and not completed
             const plusButton = document.createElement('button');
             plusButton.classList.add('plus-btn');
             plusButton.textContent = '+1';
-            plusButton.addEventListener('click', () => updateGoalProgress(goalId, 1, threshold));
-
+            plusButton.addEventListener('click', () => updateGoalProgress(goalId, title, 1, threshold));
+    
             const minusButton = document.createElement('button');
             minusButton.classList.add('minus-btn');
             minusButton.textContent = '-1';
-            minusButton.addEventListener('click', () => updateGoalProgress(goalId, -1, threshold));
-
+            minusButton.addEventListener('click', () => updateGoalProgress(goalId, title, -1, threshold));
+    
             buttonContainer.appendChild(minusButton);
             buttonContainer.appendChild(plusButton);
         }
-
+    
         newGoalContainer.appendChild(goalTitleElement);
         newGoalContainer.appendChild(progressBarContainer);
         newGoalContainer.appendChild(buttonContainer);
-
+    
         return { newGoalContainer, progressBar, progressCounter };
     }
+    
 
     function startTimedGoal(goalId, timePeriod, title) {
         let remainingTime = timePeriod * 60;
@@ -157,30 +184,40 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateProgressBar(progressBar, (timePeriod * 60 - remainingTime) / (timePeriod * 60) * 100);
                 setTimeout(updateTimer, 1000);
             } else {
-                showNotification(title);
+                showNotification(title, goalId);
+                createNewCompGoal(document.getElementById('comp-goal-container'), goalId, timePeriod, title, true);
             }
         }
     
         updateTimer();
     }
     
-    function updateGoalProgress(goalId, increment, threshold) {
+    function updateGoalProgress(goalId, title, increment, threshold) {
         const goal = ongoingGoals[goalId];
-
+    
         let progressValue = goal.progressValue + increment;
         progressValue = Math.min(threshold, Math.max(0, progressValue));
-
+    
         goal.progressBar.dataset.progress = progressValue;
         goal.progressBar.style.width = `${(progressValue / threshold) * 100}%`;
-
+    
         goal.progressCounter.textContent = `${progressValue}/${threshold}`;
         goal.progressValue = progressValue;
-
+    
         if (progressValue === threshold) {
-            showNotification(document.getElementById(goalId).querySelector('.goal-title').textContent);
-
+            const notification = showNotification(title, goalId); // Show notification first
+            createNewCompGoal(document.getElementById('comp-goal-container'), goalId, threshold, title, false); // Create completed goal next
+    
+            // Remove ongoing goal after a short delay to ensure notification is shown
+            setTimeout(() => {
+                delete ongoingGoals[goalId];
+                notificationsContainer.removeChild(notification);
+                ongoGoalContainer.removeChild(document.getElementById(goalId));
+                updateNotificationPositions();
+            }, 500);
         }
     }
+    
 
     function updateProgressBar(progressBar, progressValue) {
         progressValue = Math.min(100, Math.max(0, progressValue));
@@ -188,9 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
         progressBar.style.width = `${progressValue}%`;
     }
 
-    let completedGoalsCount = 0;
-
-    function showNotification(title) {
+    function showNotification(title, goalId) {
         const notification = document.createElement('div');
         notification.classList.add('notification');
         notification.textContent = `${title} completed!`;
@@ -204,6 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
             delete ongoingGoals[goalId];
             setTimeout(() => {
                 notificationsContainer.removeChild(notification);
+                ongoGoalContainer.removeChild(document.getElementById(goalId));
                 updateNotificationPositions();
             }, 300);
         });
@@ -239,6 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
     // Add this event listener to update positions on window resize
     window.addEventListener('resize', updateNotificationPositions);
     
