@@ -195,3 +195,8 @@ button {
 #add-goal-btn:hover {
   background-color: rgb(207, 114, 114); /* Darker pink on hover */
 }
+
+
+.join-space-field {
+  display: none;
+}

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join Space</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.ably.com/lib/ably.min-1.js"></script>
+  <script src="https://cdn.ably.com/spaces/0.1.2/iife/index.bundle.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>Choose Your Name</h2>
+    <form id="name-form">
+      <input type="text" id="username-input" placeholder="Enter your name" required>
+      <button type="submit">Submit</button>
+    </form>
+    <div class="join-space-field" id="join-space-field">
+      <h3>Join a Space</h3>
+      <input type="text" id="space-name-input" placeholder="Enter space name" required>
+      <button id="join-space-btn">Join Space</button>
+    </div>
+  </div>
+
+  <script type = "module" src = "setup.js"></script>
+
+
+</body>
+</html>
