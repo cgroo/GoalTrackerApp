@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@ably/spaces": "^0.3.0",
+    "ably": "^1.2.49"
+  }
+}
