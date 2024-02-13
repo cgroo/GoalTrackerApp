@@ -35,15 +35,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     addGoalButton.addEventListener('click', () => { // Handles user click on add goal button
         modalOverlay.style.display = 'block';
-        ongoingTab.style.pointerEvents = 'none';
-        completedTab.style.pointerEvents = 'none';
         clearGoalForm();
     });
 
     cancelGoalButton.addEventListener('click', () => { // Handles user click on cancel adding goal button
         modalOverlay.style.display = 'none';
-        ongoingTab.style.pointerEvents = 'auto';
-        completedTab.style.pointerEvents = 'auto';
     });
 
     goalTypeSelect.addEventListener('change', () => { // Handles user change goal type in adding goal menu
@@ -75,8 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        ongoingTab.style.pointerEvents = 'auto';
-        completedTab.style.pointerEvents = 'auto';
         modalOverlay.style.display = 'none';
 
         // Create a unique ID for each goal to ensure uniqueness
@@ -253,7 +247,6 @@ document.addEventListener('DOMContentLoaded', () => {
         notification.appendChild(closeButton);
     
         notificationsContainer.appendChild(notification); // Append at the bottom
-        
     
         setTimeout(() => {
             notification.classList.add('show');

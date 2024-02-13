@@ -5,8 +5,9 @@ body {
   justify-content: center;
   height: 100vh;
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: "Roboto", Arial, sans-serif;
   background-color:rgb(120, 172, 215);
+  text-align: center;
 }
 
 .goal-container {
@@ -156,7 +157,7 @@ button {
   display: none; /* Initially hide completed goals */
 }
 
-.goal-title {
+.goal-title, #welcome-title {
   font-size: 18px; /* Change font size */
   color: rgb(252, 168, 168);
   text-shadow: -1px -1px 0 rgb(160, 84, 84),  
@@ -182,8 +183,8 @@ button {
 }
 
 
-#add-goal-btn {
-  background-color: rgb(238, 136, 136); /* Pink background color */
+#add-goal-btn, #join-lobby-btn {
+  background-color: rgb(252, 168, 168); /* Pink background color */
   color: rgb(0, 0, 0); /* White text color */
   padding: 12px 24px; /* Adjust padding as needed */
   border-radius: 5px; /* Rounded corners */
@@ -192,11 +193,31 @@ button {
   cursor: pointer; /* Show pointer cursor on hover */
 }
 
-#add-goal-btn:hover {
+#add-goal-btn:hover, #join-lobby-btn:hover {
   background-color: rgb(207, 114, 114); /* Darker pink on hover */
 }
 
 
-.join-space-field {
-  display: none;
+.form-container {
+  text-align: center; /* Center align content within the container */
+  margin-bottom: 20px; /* Add margin at the bottom for spacing */
+}
+
+#username,
+#lobbyname {
+  padding: 10px;
+  font-size: 16px;
+  margin-right: 10px; /* Add margin between the input fields */
+}
+
+.header-container {
+  position: absolute;
+  top: 50px; /* Adjust the top value as needed to move the header higher */
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#welcome-title {
+  text-align: center; /* Center align the heading */
+  font-size: 36px;
 }
