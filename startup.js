@@ -33,6 +33,7 @@ function handleFormSubmission(event) {
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
+        console.log('Response received:', response); // Log the response
         return response.json();
     })
     .then(data => {
@@ -44,6 +45,7 @@ function handleFormSubmission(event) {
         console.error('There was a problem with the fetch operation:', error);
         // Handle errors or display error messages to the user
     });
+    
 }
 // Add event listener to the form for submission
 document.getElementById("join-lobby-form").addEventListener("submit", handleFormSubmission);
