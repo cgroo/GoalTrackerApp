@@ -9,6 +9,7 @@ const PORT = 3000; // Specify the port number
 
 // Middleware to parse JSON request bodies
 app.use(bodyParser.json());
+app.use(express.static(__dirname));
 
 // In-memory database to store lobbies (replace with a real database in production)
 const lobbies = [];
@@ -32,10 +33,14 @@ app.post('/lobbies', (req, res) => {
     res.json(newLobby);
 });
 
-// Serve the goal.html file
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 app.get('/goal.html', (req, res) => {
     res.sendFile(__dirname + '/goal.html');
 });
+
 
 // Start the server
 app.listen(PORT, () => {
