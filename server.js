@@ -19,12 +19,18 @@ app.post('/lobbies', (req, res) => {
     // Extract data from the request body
     const { lobbyname } = req.body;
 
+    // Log the received lobby name
+    console.log('Received lobby name:', lobbyname);
+
     // Create a new lobby object
     const newLobby = {
         id: uuidv4(), // Generate unique ID
         lobbyname: lobbyname,
         createdAt: new Date()
     };
+
+    // Log the newly created lobby
+    console.log('New lobby:', newLobby);
 
     // Add the new lobby to the in-memory database
     lobbies.push(newLobby);

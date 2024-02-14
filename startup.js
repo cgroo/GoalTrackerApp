@@ -33,19 +33,18 @@ function handleFormSubmission(event) {
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        console.log('Response received:', response); // Log the response
         return response.json();
     })
     .then(data => {
         // Handle the response from the server
         console.log(data);
-        // You can redirect the user to the lobby page or perform other actions based on the response
+        // Redirect the user to goal.html with the lobby ID/name
+        window.location.href = `/goal.html?lobbyId=${data.id}&lobbyName=${data.lobbyname}`;
     })
     .catch(error => {
         console.error('There was a problem with the fetch operation:', error);
         // Handle errors or display error messages to the user
     });
-    
 }
 // Add event listener to the form for submission
 document.getElementById("join-lobby-form").addEventListener("submit", handleFormSubmission);
