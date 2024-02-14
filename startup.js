@@ -1,12 +1,3 @@
-// Define existingLobbies array globally
-const existingLobbies = [];
-
-// Function to check if a lobby exists
-function checkLobbyExists(lobbyName) {
-    // Assume some logic to check if the lobby exists
-    return existingLobbies.includes(lobbyName);
-}
-
 // Function to handle form submission
 function handleFormSubmission(event) {
     event.preventDefault(); // Prevent form submission
@@ -46,5 +37,6 @@ function handleFormSubmission(event) {
         // Handle errors or display error messages to the user
     });
 }
+
 // Add event listener to the form for submission
 document.getElementById("join-lobby-form").addEventListener("submit", handleFormSubmission);
